@@ -23,11 +23,15 @@ RUN apt-get update && apt-get install -y \
         zip \
     && rm -rf /var/lib/apt/lists/*
 
-# Pastikan hanya satu MPM Apache yang aktif
+# Hapus SEMUA MPM yang sedang aktif
 RUN rm -f /etc/apache2/mods-enabled/mpm_*.load \
-    /etc/apache2/mods-enabled/mpm_*.conf \
-    && a2enmod mpm_prefork \
-    && a2enmod rewrite
+          /etc/apache2/mods-enabled/mpm_*.conf
+
+# Aktifkan hanya MPM Prefork
+RUN a2enmod mpm_prefork rewrite
+
+# Pastikan hanya mpm_prefork yang aktif
+RUN apache2ctl -M 2>&1 | grep mpm
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
