@@ -21,6 +21,8 @@ RUN apt-get update && apt-get install -y \
         gd \
         intl \
         zip \
+    && a2dismod mpm_event mpm_worker 2>/dev/null || true \
+    && a2enmod mpm_prefork \
     && a2enmod rewrite \
     && rm -rf /var/lib/apt/lists/*
 
@@ -36,8 +38,7 @@ RUN composer install \
     --no-interaction
 
 RUN sed -i 's!/var/www/html!/var/www/html/public!g' \
-    /etc/apache2/sites-available/000-default.conf \
-    /etc/apache2/apache2.conf
+    /etc/apache2/sites-available/000-default.conf
 
 RUN chown -R www-data:www-data \
     /var/www/html/storage \
